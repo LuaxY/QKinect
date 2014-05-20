@@ -11,14 +11,14 @@ Programme::Programme(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    drawZone = new DrawZone(ui->centralWidget);
-    drawZone->setGeometry(QRect(230, 0, 640, 480));
+    drawZone = new DrawZone(ui->centralWidget, this);
+    drawZone->setGeometry(QRect(300, 0, 640, 480));
 
     test = new QTimer(this);
     connect(test, SIGNAL(timeout()), this, SLOT(sltDrawSkeleton()));
 
     connect(ui->btnActiveStream, SIGNAL(clicked()), this, SLOT(sltActiveStream()));
-    connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(sltDrawZone()));
+    connect(ui->HAND_LEFT_START, SIGNAL(clicked()), this, SLOT(sltDrawZone()));
 
     QCoreApplication::postEvent(this, new CustomEvent<StreamEvent>());
 }
@@ -35,7 +35,18 @@ bool Programme::event(QEvent* event)
         CustomEvent<StreamEvent>* e = static_cast<CustomEvent<StreamEvent>*>(event);
         qDebug() << "Event Stream";
         drawSkeleton = !drawSkeleton;
-        test->start(10);
+        test->start(40);
+
+        return true;
+    }
+
+    if (event->type() == CustomEvent<SelectZoneEvent>::eventType)
+    {
+        CustomEvent<SelectZoneEvent>* e = static_cast<CustomEvent<SelectZoneEvent>*>(event);
+        qDebug() << "Event SelectZone";
+
+        QRect rect = drawZone->zones[drawZone->current].rect;
+        ui->HAND_LEFT_START->setText(QString("[%1;%2|%3;%4]").arg(rect.x()).arg(rect.y()).arg(rect.width()).arg(rect.height()));
 
         return true;
     }
@@ -43,25 +54,12 @@ bool Programme::event(QEvent* event)
     return QWidget::event(event);
 }
 
-void Programme::paintEvent(QPaintEvent*)
-{
-    /*if (drawSkeleton)
-    {
-        QPainter painter(drawZone);
-        QPen pen;
-        pen.setColor(QColor("red"));
-
-        painter.setPen(pen);
-        painter.drawEllipse(QPoint(50, 50), 10, 20);
-    }*/
-}
-
 void Programme::sltDrawSkeleton()
 {
     if(drawSkeleton)
     {
         drawZone->update();
-        test->start(10);
+        test->start(40);
     }
 }
 
@@ -74,6 +72,6 @@ void Programme::sltDrawZone()
 {
     if(ui->HAND_LEFT_ACTIVE->isChecked())
     {
-        drawZone->addRect(ui->HAND_LEFT_X->value(), ui->HAND_LEFT_Y->value(), 50, 50);
+        drawZone->addZone("hand_left");
     }
 }

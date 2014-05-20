@@ -5,6 +5,7 @@
 #include <QPainter>
 #include <QWidget>
 #include <QTimer>
+#include <QMouseEvent>
 
 #include "drawzone.h"
 
@@ -27,7 +28,6 @@ private:
     QTimer* test;
 
     bool event(QEvent* event);
-    void paintEvent(QPaintEvent*);
 
 private slots:
     void sltDrawSkeleton();
