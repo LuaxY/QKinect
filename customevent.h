@@ -3,7 +3,7 @@
 
 #include <QEvent>
 
-enum EventNames { StreamEvent };
+enum EventNames { StreamEvent, SelectZoneEvent };
 
 template<EventNames E>
 class CustomEvent : public QEvent
@@ -32,5 +32,6 @@ private:
 };
 
 QEvent::Type CustomEvent<StreamEvent>::eventType = QEvent::None;
+QEvent::Type CustomEvent<SelectZoneEvent>::eventType = QEvent::None;
 
 #endif // CUSTOMEVENT_H
