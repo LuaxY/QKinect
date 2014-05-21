@@ -15,10 +15,17 @@ TEMPLATE = app
 SOURCES += main.cpp\
         programme.cpp \
     customevent.cpp \
-    drawzone.cpp
+    drawzone.cpp \
+    qkinect.cpp
 
 HEADERS  += programme.h \
     customevent.h \
-    drawzone.h
+    drawzone.h \
+    qkinect.h
 
 FORMS    += programme.ui
+
+LIBS     += C:/Kinect/lib/x86/Kinect10.lib
+
+INCLUDEPATH += C:/Kinect/inc
+#DEPENDPATH  += C:/Kinect/inc/

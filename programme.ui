@@ -57,7 +57,7 @@
      <rect>
       <x>10</x>
       <y>30</y>
-      <width>281</width>
+      <width>306</width>
       <height>102</height>
      </rect>
     </property>
@@ -189,6 +189,32 @@
     </property>
     <property name="text">
      <string>Draw</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnKinectStart">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>220</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Kinect start</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnKinectStop">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>250</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Kinect stop</string>
     </property>
    </widget>
   </widget>

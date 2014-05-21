@@ -8,6 +8,7 @@
 #include <QMouseEvent>
 
 #include "drawzone.h"
+#include "qkinect.h"
 
 namespace Ui {
 class Programme;
@@ -26,6 +27,7 @@ private:
     DrawZone* drawZone;
     bool drawSkeleton;
     QTimer* test;
+    QKinect* kinect;
 
     bool event(QEvent* event);
 
@@ -33,6 +35,8 @@ private slots:
     void sltDrawSkeleton();
     void sltActiveStream();
     void sltDrawZone();
+    void sltKinectStart();
+    void sltKinectStop();
 };
 
 #endif // PROGRAMME_H

@@ -10,6 +10,7 @@ Programme::Programme(QWidget *parent) :
     drawSkeleton(false)
 {
     ui->setupUi(this);
+    kinect = new QKinect(this);
 
     drawZone = new DrawZone(ui->centralWidget, this);
     drawZone->setGeometry(QRect(300, 0, 640, 480));
@@ -18,13 +19,17 @@ Programme::Programme(QWidget *parent) :
     connect(test, SIGNAL(timeout()), this, SLOT(sltDrawSkeleton()));
 
     connect(ui->btnActiveStream, SIGNAL(clicked()), this, SLOT(sltActiveStream()));
-    connect(ui->HAND_LEFT_START, SIGNAL(clicked()), this, SLOT(sltDrawZone()));
+    //connect(ui->HAND_LEFT_START, SIGNAL(clicked()), this, SLOT(sltDrawZone()));
+    connect(ui->btnKinectStart, SIGNAL(clicked()), this, SLOT(sltKinectStart()));
+    connect(ui->btnKinectStop, SIGNAL(clicked()), this, SLOT(sltKinectStop()));
 
     QCoreApplication::postEvent(this, new CustomEvent<StreamEvent>());
 }
 
 Programme::~Programme()
 {
+    sltKinectStop();
+    delete kinect;
     delete ui;
 }
 
@@ -40,7 +45,7 @@ bool Programme::event(QEvent* event)
         return true;
     }
 
-    if (event->type() == CustomEvent<SelectZoneEvent>::eventType)
+    /*if (event->type() == CustomEvent<SelectZoneEvent>::eventType)
     {
         CustomEvent<SelectZoneEvent>* e = static_cast<CustomEvent<SelectZoneEvent>*>(event);
         qDebug() << "Event SelectZone";
@@ -49,7 +54,7 @@ bool Programme::event(QEvent* event)
         ui->HAND_LEFT_START->setText(QString("[%1;%2|%3;%4]").arg(rect.x()).arg(rect.y()).arg(rect.width()).arg(rect.height()));
 
         return true;
-    }
+    }*/
 
     return QWidget::event(event);
 }
@@ -59,7 +64,6 @@ void Programme::sltDrawSkeleton()
     if(drawSkeleton)
     {
         drawZone->update();
-        test->start(40);
     }
 }
 
@@ -70,8 +74,18 @@ void Programme::sltActiveStream()
 
 void Programme::sltDrawZone()
 {
-    if(ui->HAND_LEFT_ACTIVE->isChecked())
+    /*if(ui->HAND_LEFT_ACTIVE->isChecked())
     {
         drawZone->addZone("hand_left");
-    }
+    }*/
+}
+
+void Programme::sltKinectStart()
+{
+    kinect->start();
+}
+
+void Programme::sltKinectStop()
+{
+    kinect->stop();
 }
