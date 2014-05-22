@@ -10,10 +10,11 @@ Programme::Programme(QWidget *parent) :
     drawSkeleton(false)
 {
     ui->setupUi(this);
-    kinect = new QKinect(this);
 
     drawZone = new DrawZone(ui->centralWidget, this);
     drawZone->setGeometry(QRect(300, 0, 640, 480));
+
+    kinect = new QKinect(this, drawZone);
 
     test = new QTimer(this);
     connect(test, SIGNAL(timeout()), this, SLOT(sltDrawSkeleton()));

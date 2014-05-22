@@ -8,21 +8,27 @@ DrawZone::DrawZone(QWidget *parent, QWidget *main) :
     QWidget(parent),
     mMain(main)
 {
-    posX = 320;
-    posY = 290;
-    directionX = 2;
-    directionY = 1;
+    for(unsigned int i = 0; i < 5; i++)
+    {
+        skeleton[i].color = Qt::red;
+        skeleton[i].isSet = false;
+        skeleton[i].untracked = 0;
+    }
+
+    skeleton[0].color = Qt::blue;
+    skeleton[1].color = Qt::magenta;
+    skeleton[2].color = Qt::cyan;
+    skeleton[3].color = Qt::yellow;
 }
 
 void DrawZone::paintEvent(QPaintEvent*)
 {
     QPainter painter(this);
-
     painter.setRenderHint(QPainter::Antialiasing, true);
-
     painter.fillRect(QRect(0, 0, width(), height()), Qt::black);
 
     /* DRAW GRID */
+
     /*painter.setPen(QPen(Qt::darkGray, 1));
 
     for(int x = 0; x <= 640; x += CASE_SIZE)
@@ -34,50 +40,70 @@ void DrawZone::paintEvent(QPaintEvent*)
     }*/
 
     /* DRAW HIGHTLIGHT RECT */
-    hightlight(painter, posX, posY);
 
+    hightlight(painter, posX, posY);
     QPoint mouse = this->mapFromGlobal(QCursor::pos());
     hightlight(painter, mouse.x(), mouse.y());
-
     painter.setBrush(Qt::NoBrush);
 
     /* DRAW SKELETON */
-    painter.setPen(QPen(Qt::red, 3));
-    painter.drawLine(QPoint(320, 240), QPoint(posX, posY));
 
-    painter.setPen(QPen(Qt::green, 2));
-    painter.drawEllipse(QPoint(320, 240), 5, 5);
-    painter.drawEllipse(QPoint(posX, posY), 5, 5);
+    lock();
 
-    if (directionX == 1)
+    for(unsigned int i = 0; i < 5; i++)
     {
-        posX++;
+        if(!skeleton[i].isSet)
+            continue;
 
-        if (posX >= 370)
-            directionX = 2;
+        if(skeleton[i].untracked > 0)
+        {
+            skeleton[i].untracked++;
+            if(skeleton[i].untracked > 20)
+            {
+                skeleton[i].isSet = false;
+                continue;
+            }
+        }
+
+        for(unsigned int j = 0; j < 19; j++)
+        {
+            Jointure joint = skeleton[i].jointures[j];
+
+            if(skeleton[i].data.eSkeletonPositionTrackingState[joint.pos1] == NUI_SKELETON_NOT_TRACKED || skeleton[i].data.eSkeletonPositionTrackingState[joint.pos2] == NUI_SKELETON_NOT_TRACKED)
+                continue;
+
+            QPoint pos1 = adjustSize(skeleton[i].data.SkeletonPositions[joint.pos1]);
+            QPoint pos2 = adjustSize(skeleton[i].data.SkeletonPositions[joint.pos2]);
+
+            if(skeleton[i].data.eSkeletonPositionTrackingState[joint.pos1] == NUI_SKELETON_POSITION_TRACKED || skeleton[i].data.eSkeletonPositionTrackingState[joint.pos2] == NUI_SKELETON_POSITION_TRACKED)
+                painter.setPen(QPen(skeleton[i].color, 3));
+            else
+                painter.setPen(QPen(Qt::gray, 1));
+
+            painter.drawLine(pos1, pos2);
+
+            if(skeleton[i].data.eSkeletonPositionTrackingState[joint.pos1] == NUI_SKELETON_POSITION_TRACKED || skeleton[i].data.eSkeletonPositionTrackingState[joint.pos2] == NUI_SKELETON_POSITION_TRACKED)
+                painter.setPen(QPen(Qt::green, 1));
+            else
+                painter.setPen(QPen(Qt::darkGray, 1));
+
+            painter.drawEllipse(pos1, 2, 2);
+            painter.drawEllipse(pos2, 2, 2);
+        }
+
+        QPoint headPos = adjustSize(skeleton[i].data.SkeletonPositions[NUI_SKELETON_POSITION_HEAD]);
+        QPoint leftPos = adjustSize(skeleton[i].data.SkeletonPositions[NUI_SKELETON_POSITION_HAND_LEFT]);
+        QPoint rightPos = adjustSize(skeleton[i].data.SkeletonPositions[NUI_SKELETON_POSITION_HAND_RIGHT]);
+
+        painter.setPen(QPen(Qt::red, 5));
+        painter.setBrush(Qt::white);
+
+        painter.drawEllipse(headPos, 30, 30);
+        painter.drawEllipse(leftPos, 10, 10);
+        painter.drawEllipse(rightPos, 10, 10);
     }
-    else
-    {
-        posX--;
 
-        if (posX <= 270)
-            directionX = 1;
-    }
-
-    if (directionY == 1)
-    {
-        posY++;
-
-        if (posY >= 290)
-            directionY = 2;
-    }
-    else
-    {
-        posY--;
-
-        if (posY <= 190)
-            directionY = 1;
-    }
+    unlock();
 }
 
 void DrawZone::mousePressEvent(QMouseEvent* e)
@@ -145,4 +171,55 @@ QPoint DrawZone::lissage(int posX, int posY)
     }
 
     return point;
+}
+
+QPoint DrawZone::adjustSize(Vector4 skeletonPoint)
+{
+    LONG x, y;
+    USHORT depth;
+
+    NuiTransformSkeletonToDepthImage(skeletonPoint, &x, &y, &depth);
+
+    float pointX = static_cast<float>(x * this->width()) / 320;
+    float pointY = static_cast<float>(y * this->height()) / 240;
+
+    return QPoint(pointX, pointY);
+}
+
+void DrawZone::SetSkeleton(int id, NUI_SKELETON_DATA data)
+{
+    if(id >= 5)
+        id = 0;
+
+    skeleton[id].data = data;
+}
+
+void DrawZone::DrawBone(int id, int joint, NUI_SKELETON_POSITION_INDEX pos1, NUI_SKELETON_POSITION_INDEX pos2)
+{
+    if(id >= 5)
+        id = 0;
+
+    skeleton[id].jointures[joint].pos1 = pos1;
+    skeleton[id].jointures[joint].pos2 = pos2;
+
+    skeleton[id].isSet = true;
+    skeleton[id].untracked = 0;
+}
+
+void DrawZone::RemoveSkeleton(int id)
+{
+    if(id >= 5)
+        id = 0;
+
+    skeleton[id].untracked++;
+}
+
+void DrawZone::lock()
+{
+    mutex.lock();
+}
+
+void DrawZone::unlock()
+{
+    mutex.unlock();
 }

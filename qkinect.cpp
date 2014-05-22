@@ -2,18 +2,21 @@
 #include <QDebug>
 #include <exception>
 
-QKinect::QKinect(QObject *parent) :
+QKinect::QKinect(QObject *parent, DrawZone* drawZone) :
     QThread(parent),
     isRunning(false),
-    isInitialized(false)
+    isInitialized(false),
+    mDrawZone(drawZone)
 {
 }
 
 void QKinect::start()
 {
+    if(isRunning)
+        return;
+
     qDebug() << "starting Kinect";
-    if(!isRunning)
-        QThread::start();
+    QThread::start();
 }
 
 void QKinect::stop()
@@ -21,10 +24,12 @@ void QKinect::stop()
     if(isRunning)
         isRunning = false;
 
-    qDebug() << "stoping Kinect";
-    wait();
+    qDebug() << "stopping Kinect";
 
-    NuiShutdown();
+    wait();
+    NuiSkeletonTrackingDisable();
+    //NuiShutdown();
+
     isInitialized = false;
 }
 
@@ -64,22 +69,55 @@ void QKinect::init()
 
 void QKinect::tracking()
 {
-    int count = 1;
     while(isRunning)
     {
         HRESULT res = NuiSkeletonGetNextFrame(1, &mSkeletonFrame);
 
-        bool foundSkeleton = false;
+        NuiTransformSmooth(&mSkeletonFrame, NULL);
+
         for(int i = 0; i < NUI_SKELETON_COUNT; i++)
         {
             if(mSkeletonFrame.SkeletonData[i].eTrackingState == NUI_SKELETON_TRACKED)
-                foundSkeleton = true;
-        }
+            {
+                mDrawZone->lock();
 
-        if(foundSkeleton)
-        {
-            qDebug() << "found skeleton " << count;
-            count++;
+                mDrawZone->SetSkeleton(i, mSkeletonFrame.SkeletonData[i]);
+
+                // Render Torso
+                mDrawZone->DrawBone(i, 0, NUI_SKELETON_POSITION_HEAD, NUI_SKELETON_POSITION_SHOULDER_CENTER);
+                mDrawZone->DrawBone(i, 1, NUI_SKELETON_POSITION_SHOULDER_CENTER, NUI_SKELETON_POSITION_SHOULDER_LEFT);
+                mDrawZone->DrawBone(i, 2, NUI_SKELETON_POSITION_SHOULDER_CENTER, NUI_SKELETON_POSITION_SHOULDER_RIGHT);
+                mDrawZone->DrawBone(i, 3, NUI_SKELETON_POSITION_SHOULDER_CENTER, NUI_SKELETON_POSITION_SPINE);
+                mDrawZone->DrawBone(i, 4, NUI_SKELETON_POSITION_SPINE, NUI_SKELETON_POSITION_HIP_CENTER);
+                mDrawZone->DrawBone(i, 5, NUI_SKELETON_POSITION_HIP_CENTER, NUI_SKELETON_POSITION_HIP_LEFT);
+                mDrawZone->DrawBone(i, 6, NUI_SKELETON_POSITION_HIP_CENTER, NUI_SKELETON_POSITION_HIP_RIGHT);
+
+                // Left Arm
+                mDrawZone->DrawBone(i, 7, NUI_SKELETON_POSITION_SHOULDER_LEFT, NUI_SKELETON_POSITION_ELBOW_LEFT);
+                mDrawZone->DrawBone(i, 8, NUI_SKELETON_POSITION_ELBOW_LEFT, NUI_SKELETON_POSITION_WRIST_LEFT);
+                mDrawZone->DrawBone(i, 9, NUI_SKELETON_POSITION_WRIST_LEFT, NUI_SKELETON_POSITION_HAND_LEFT);
+
+                // Right Arm
+                mDrawZone->DrawBone(i, 10, NUI_SKELETON_POSITION_SHOULDER_RIGHT, NUI_SKELETON_POSITION_ELBOW_RIGHT);
+                mDrawZone->DrawBone(i, 11, NUI_SKELETON_POSITION_ELBOW_RIGHT, NUI_SKELETON_POSITION_WRIST_RIGHT);
+                mDrawZone->DrawBone(i, 12, NUI_SKELETON_POSITION_WRIST_RIGHT, NUI_SKELETON_POSITION_HAND_RIGHT);
+
+                // Left Leg
+                mDrawZone->DrawBone(i, 13, NUI_SKELETON_POSITION_HIP_LEFT, NUI_SKELETON_POSITION_KNEE_LEFT);
+                mDrawZone->DrawBone(i, 14, NUI_SKELETON_POSITION_KNEE_LEFT, NUI_SKELETON_POSITION_ANKLE_LEFT);
+                mDrawZone->DrawBone(i, 15, NUI_SKELETON_POSITION_ANKLE_LEFT, NUI_SKELETON_POSITION_FOOT_LEFT);
+
+                // Right Leg
+                mDrawZone->DrawBone(i, 16, NUI_SKELETON_POSITION_HIP_RIGHT, NUI_SKELETON_POSITION_KNEE_RIGHT);
+                mDrawZone->DrawBone(i, 17, NUI_SKELETON_POSITION_KNEE_RIGHT, NUI_SKELETON_POSITION_ANKLE_RIGHT);
+                mDrawZone->DrawBone(i, 18, NUI_SKELETON_POSITION_ANKLE_RIGHT, NUI_SKELETON_POSITION_FOOT_RIGHT);
+
+                mDrawZone->unlock();
+            }
+            else if(mSkeletonFrame.SkeletonData[i].eTrackingState == NUI_SKELETON_NOT_TRACKED)
+            {
+                mDrawZone->RemoveSkeleton(i);
+            }
         }
 
         msleep(30);
