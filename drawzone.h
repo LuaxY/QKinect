@@ -35,8 +35,8 @@ public:
 private:
     // variables
     QWidget* mMain;
-    Skeleton skeleton[5];
-    QMutex mutex;
+    Skeleton mSkeleton[5];
+    QMutex mMutex;
 
     // event
     void paintEvent(QPaintEvent*);

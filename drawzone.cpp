@@ -16,16 +16,16 @@ DrawZone::DrawZone(QWidget *parent, QWidget *main) :
     // Initialisation de chaque squelettes
     for(unsigned int i = 0; i < 5; i++)
     {
-        skeleton[i].color = Qt::red;
-        skeleton[i].isSet = false;
-        skeleton[i].untracked = 0;
+        mSkeleton[i].color = Qt::red;
+        mSkeleton[i].isSet = false;
+        mSkeleton[i].untracked = 0;
     }
 
     // Affectation d'un couleur différente pour chaque squelette
-    skeleton[0].color = Qt::blue;
-    skeleton[1].color = Qt::magenta;
-    skeleton[2].color = Qt::cyan;
-    skeleton[3].color = Qt::yellow;
+    mSkeleton[0].color = Qt::blue;
+    mSkeleton[1].color = Qt::magenta;
+    mSkeleton[2].color = Qt::cyan;
+    mSkeleton[3].color = Qt::yellow;
 }
 
 /**
@@ -47,23 +47,23 @@ void DrawZone::paintEvent(QPaintEvent*)
     for(unsigned int i = 0; i < 5; i++)
     {
         // Si le squelettes n'a pas encore de données on passe
-        if(!skeleton[i].isSet)
+        if(!mSkeleton[i].isSet)
             continue;
 
         // Si le squelettes n'est plus traquer depuis 20 frames on le supprime
-        if(skeleton[i].untracked > 0)
+        if(mSkeleton[i].untracked > 0)
         {
-            skeleton[i].untracked++;
-            if(skeleton[i].untracked > 20)
+            mSkeleton[i].untracked++;
+            if(mSkeleton[i].untracked > 20)
             {
-                skeleton[i].isSet = false;
+                mSkeleton[i].isSet = false;
                 continue;
             }
         }
 
         // On dessine chaque jointure du squelette :
 
-        // Jointure du torse
+        // Jointures du torse
         DrawJointure(painter, i, NUI_SKELETON_POSITION_HEAD, NUI_SKELETON_POSITION_SHOULDER_CENTER);
         DrawJointure(painter, i, NUI_SKELETON_POSITION_SHOULDER_CENTER, NUI_SKELETON_POSITION_SHOULDER_LEFT);
         DrawJointure(painter, i, NUI_SKELETON_POSITION_SHOULDER_CENTER, NUI_SKELETON_POSITION_SHOULDER_RIGHT);
@@ -72,30 +72,30 @@ void DrawZone::paintEvent(QPaintEvent*)
         DrawJointure(painter, i, NUI_SKELETON_POSITION_HIP_CENTER, NUI_SKELETON_POSITION_HIP_LEFT);
         DrawJointure(painter, i, NUI_SKELETON_POSITION_HIP_CENTER, NUI_SKELETON_POSITION_HIP_RIGHT);
 
-        // Joiunture bras gauche
+        // Joiuntures bras gauche
         DrawJointure(painter, i, NUI_SKELETON_POSITION_SHOULDER_LEFT, NUI_SKELETON_POSITION_ELBOW_LEFT);
         DrawJointure(painter, i, NUI_SKELETON_POSITION_ELBOW_LEFT, NUI_SKELETON_POSITION_WRIST_LEFT);
         DrawJointure(painter, i, NUI_SKELETON_POSITION_WRIST_LEFT, NUI_SKELETON_POSITION_HAND_LEFT);
 
-        // Jointure bras droit
+        // Jointures bras droit
         DrawJointure(painter, i, NUI_SKELETON_POSITION_SHOULDER_RIGHT, NUI_SKELETON_POSITION_ELBOW_RIGHT);
         DrawJointure(painter, i, NUI_SKELETON_POSITION_ELBOW_RIGHT, NUI_SKELETON_POSITION_WRIST_RIGHT);
         DrawJointure(painter, i, NUI_SKELETON_POSITION_WRIST_RIGHT, NUI_SKELETON_POSITION_HAND_RIGHT);
 
-        // Jointure jambe gauche
+        // Jointures jambe gauche
         DrawJointure(painter, i, NUI_SKELETON_POSITION_HIP_LEFT, NUI_SKELETON_POSITION_KNEE_LEFT);
         DrawJointure(painter, i, NUI_SKELETON_POSITION_KNEE_LEFT, NUI_SKELETON_POSITION_ANKLE_LEFT);
         DrawJointure(painter, i, NUI_SKELETON_POSITION_ANKLE_LEFT, NUI_SKELETON_POSITION_FOOT_LEFT);
 
-        // Jointure jambe droite
+        // Jointures jambe droite
         DrawJointure(painter, i, NUI_SKELETON_POSITION_HIP_RIGHT, NUI_SKELETON_POSITION_KNEE_RIGHT);
         DrawJointure(painter, i, NUI_SKELETON_POSITION_KNEE_RIGHT, NUI_SKELETON_POSITION_ANKLE_RIGHT);
         DrawJointure(painter, i, NUI_SKELETON_POSITION_ANKLE_RIGHT, NUI_SKELETON_POSITION_FOOT_RIGHT);
 
-        // For fun : On grossi les point de la tête et des main pour les mettre en valeur
-        QPoint headPos  = AdjustSize(skeleton[i].data.SkeletonPositions[NUI_SKELETON_POSITION_HEAD]);
-        QPoint leftPos  = AdjustSize(skeleton[i].data.SkeletonPositions[NUI_SKELETON_POSITION_HAND_LEFT]);
-        QPoint rightPos = AdjustSize(skeleton[i].data.SkeletonPositions[NUI_SKELETON_POSITION_HAND_RIGHT]);
+        // For fun : On grossi les points de la tête et des main pour les mettre en valeur
+        QPoint headPos  = AdjustSize(mSkeleton[i].data.SkeletonPositions[NUI_SKELETON_POSITION_HEAD]);
+        QPoint leftPos  = AdjustSize(mSkeleton[i].data.SkeletonPositions[NUI_SKELETON_POSITION_HAND_LEFT]);
+        QPoint rightPos = AdjustSize(mSkeleton[i].data.SkeletonPositions[NUI_SKELETON_POSITION_HAND_RIGHT]);
 
         painter.setPen(QPen(Qt::red, 5));
         painter.setBrush(Qt::white);
@@ -128,7 +128,7 @@ void DrawZone::mousePressEvent(QMouseEvent* e)
 
 /**
  * @brief DrawZone::adjustSize : ajuste la position des point en fonction de la taille de la zone de dessin
- * @param skeletonPoint : point d'origine
+ * @param mSkeletonPoint : point d'origine
  * @return : point ajustée
  */
 QPoint DrawZone::AdjustSize(Vector4 skeletonPoint)
@@ -145,7 +145,7 @@ QPoint DrawZone::AdjustSize(Vector4 skeletonPoint)
 }
 
 /**
- * @brief DrawZone::SetSkeleton : enregistre les coordonnées de chauqe points du squelette
+ * @brief DrawZone::SetmSkeleton : enregistre les coordonnées de chauqe points du squelette
  * @param id : numéro du squelette
  * @param data : coordonnées de chaque points
  */
@@ -154,13 +154,13 @@ void DrawZone::SetSkeleton(int id, NUI_SKELETON_DATA data)
     if(id >= 5)
         id = 0;
 
-    skeleton[id].data = data;
-    skeleton[id].isSet = true;
-    skeleton[id].untracked = 0;
+    mSkeleton[id].data = data;
+    mSkeleton[id].isSet = true;
+    mSkeleton[id].untracked = 0;
 }
 
 /**
- * @brief DrawZone::RemoveSkeleton : supprime une squelette du dessin
+ * @brief DrawZone::RemovemSkeleton : supprime une squelette du dessin
  * @param id : numéro du squelette
  */
 void DrawZone::RemoveSkeleton(int id)
@@ -168,26 +168,33 @@ void DrawZone::RemoveSkeleton(int id)
     if(id >= 5)
         id = 0;
 
-    skeleton[id].untracked++;
+    mSkeleton[id].untracked++;
 }
 
+/**
+ * @brief DrawZone::DrawJointure : dessine une jointure entre deux point
+ * @param painter : référence vers l'objet QPainter de la zone de dessin
+ * @param id : numéro du squelette
+ * @param posA : position du point A
+ * @param posB : position du point B
+ */
 void DrawZone::DrawJointure(QPainter &painter, int id, NUI_SKELETON_POSITION_INDEX posA, NUI_SKELETON_POSITION_INDEX posB)
 {
-    NUI_SKELETON_POSITION_TRACKING_STATE statePointA = skeleton[id].data.eSkeletonPositionTrackingState[posA];
-    NUI_SKELETON_POSITION_TRACKING_STATE statePointB = skeleton[id].data.eSkeletonPositionTrackingState[posB];
+    NUI_SKELETON_POSITION_TRACKING_STATE statePointA = mSkeleton[id].data.eSkeletonPositionTrackingState[posA];
+    NUI_SKELETON_POSITION_TRACKING_STATE statePointB = mSkeleton[id].data.eSkeletonPositionTrackingState[posB];
 
     // Si la position de l'un des deux point est inconnue, on passe
     if(statePointA == NUI_SKELETON_NOT_TRACKED || statePointB == NUI_SKELETON_NOT_TRACKED)
         return;
 
     // Ajustement des coordonnées en fonction de la zone de dessin
-    QPoint pointA = AdjustSize(skeleton[id].data.SkeletonPositions[posA]);
-    QPoint pointB = AdjustSize(skeleton[id].data.SkeletonPositions[posB]);
+    QPoint pointA = AdjustSize(mSkeleton[id].data.SkeletonPositions[posA]);
+    QPoint pointB = AdjustSize(mSkeleton[id].data.SkeletonPositions[posB]);
 
     // Si la jointures est traquer (TRACKED) on dessine la jointure avec la couleur respectif du squelette
     // Si c'est pas le cas (INFERRED) on dessine la jointure en gris
     if(statePointA == NUI_SKELETON_POSITION_TRACKED || statePointB == NUI_SKELETON_POSITION_TRACKED)
-        painter.setPen(QPen(skeleton[id].color, 3));
+        painter.setPen(QPen(mSkeleton[id].color, 3));
     else
         painter.setPen(QPen(Qt::gray, 1));
 
@@ -210,7 +217,7 @@ void DrawZone::DrawJointure(QPainter &painter, int id, NUI_SKELETON_POSITION_IND
  */
 void DrawZone::lock()
 {
-    mutex.lock();
+    mMutex.lock();
 }
 
 /**
@@ -218,5 +225,5 @@ void DrawZone::lock()
  */
 void DrawZone::unlock()
 {
-    mutex.unlock();
+    mMutex.unlock();
 }
