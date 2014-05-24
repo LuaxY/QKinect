@@ -20,7 +20,6 @@ Programme::Programme(QWidget *parent) :
     connect(test, SIGNAL(timeout()), this, SLOT(sltDrawSkeleton()));
 
     connect(ui->btnActiveStream, SIGNAL(clicked()), this, SLOT(sltActiveStream()));
-    //connect(ui->HAND_LEFT_START, SIGNAL(clicked()), this, SLOT(sltDrawZone()));
     connect(ui->btnKinectStart, SIGNAL(clicked()), this, SLOT(sltKinectStart()));
     connect(ui->btnKinectStop, SIGNAL(clicked()), this, SLOT(sltKinectStop()));
 
