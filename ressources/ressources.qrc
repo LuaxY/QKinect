@@ -1,0 +1,9 @@
+<RCC>
+    <qresource lang="fr" prefix="/">
+        <file>webcam.png</file>
+        <file>door_in.png</file>
+        <file>pause.png</file>
+        <file>play.png</file>
+        <file>help.png</file>
+    </qresource>
+</RCC>

@@ -29,3 +29,6 @@ LIBS     += C:/Kinect/lib/x86/Kinect10.lib
 
 INCLUDEPATH += C:/Kinect/inc
 #DEPENDPATH  += C:/Kinect/inc/
+
+RESOURCES += \
+    ressources/ressources.qrc

@@ -11,16 +11,20 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>QKinect</string>
+   <string>TheClair II : Module NUI</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="ressources/ressources.qrc">
+    <normaloff>:/webcam.png</normaloff>:/webcam.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QListWidget" name="listWidget">
     <property name="geometry">
      <rect>
-      <x>950</x>
+      <x>940</x>
       <y>0</y>
-      <width>141</width>
-      <height>481</height>
+      <width>152</width>
+      <height>480</height>
      </rect>
     </property>
     <item>
@@ -39,182 +43,102 @@
      </property>
     </item>
    </widget>
-   <widget class="QPushButton" name="btnActiveStream">
+   <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>300</width>
-      <height>23</height>
+      <x>9</x>
+      <y>100</y>
+      <width>271</width>
+      <height>80</height>
      </rect>
     </property>
-    <property name="text">
-     <string>PushButton</string>
+    <property name="title">
+     <string>Kinect</string>
     </property>
+    <widget class="QPushButton" name="btnKinectStart">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>121</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Démarrer</string>
+     </property>
+     <property name="icon">
+      <iconset resource="ressources/ressources.qrc">
+       <normaloff>:/play.png</normaloff>:/play.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>32</width>
+       <height>32</height>
+      </size>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btnKinectStop">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>20</y>
+       <width>121</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Arrêter</string>
+     </property>
+     <property name="icon">
+      <iconset resource="ressources/ressources.qrc">
+       <normaloff>:/pause.png</normaloff>:/pause.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>32</width>
+       <height>32</height>
+      </size>
+     </property>
+    </widget>
    </widget>
-   <widget class="QWidget" name="gridLayoutWidget">
+   <widget class="QGroupBox" name="groupBox_2">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>30</y>
-      <width>306</width>
-      <height>102</height>
+      <y>10</y>
+      <width>271</width>
+      <height>80</height>
      </rect>
     </property>
-    <layout class="QGridLayout" name="gridLayout">
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>HAND_RIGHT</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>HAND_LEFT</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_3">
-       <property name="styleSheet">
-        <string notr="true">font-weight:bold;</string>
-       </property>
-       <property name="text">
-        <string>      Point</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLabel" name="label_4">
-       <property name="styleSheet">
-        <string notr="true">font-weight:bold;</string>
-       </property>
-       <property name="text">
-        <string>      Start                    </string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="2">
-      <widget class="QLabel" name="label_5">
-       <property name="styleSheet">
-        <string notr="true">font-weight:bold;</string>
-       </property>
-       <property name="text">
-        <string>       End                    </string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="3">
-      <widget class="QCheckBox" name="HAND_RIGHT_ACTIVE">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="3">
-      <widget class="QCheckBox" name="HAND_LEFT_ACTIVE">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="label_6">
-       <property name="text">
-        <string>HEAD</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="3">
-      <widget class="QCheckBox" name="HEAD_ACTIVE">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QPushButton" name="HAND_LEFT_START">
-       <property name="text">
-        <string>[--;--|--;--]</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="2">
-      <widget class="QPushButton" name="HAND_LEFT_END">
-       <property name="text">
-        <string>[--;--|--;--]</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QPushButton" name="HAND_RIGHT_START">
-       <property name="text">
-        <string>[--;--|--;--]</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QPushButton" name="HEAD_START">
-       <property name="text">
-        <string>[--;--|--;--]</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="2">
-      <widget class="QPushButton" name="HAND_RIGHT_END">
-       <property name="text">
-        <string>[--;--|--;--]</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="2">
-      <widget class="QPushButton" name="HEAD_END">
-       <property name="text">
-        <string>[--;--|--;--]</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <property name="title">
+     <string>QPainter</string>
+    </property>
+    <widget class="QPushButton" name="btnActiveStream">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>251</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Démarrer/Arrêter Event Stream</string>
+     </property>
+    </widget>
    </widget>
-   <widget class="QPushButton" name="pushButton">
+   <widget class="Line" name="line">
     <property name="geometry">
      <rect>
-      <x>80</x>
-      <y>160</y>
-      <width>75</width>
-      <height>23</height>
+      <x>280</x>
+      <y>-10</y>
+      <width>20</width>
+      <height>501</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Draw</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="btnKinectStart">
-    <property name="geometry">
-     <rect>
-      <x>40</x>
-      <y>220</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Kinect start</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="btnKinectStop">
-    <property name="geometry">
-     <rect>
-      <x>40</x>
-      <y>250</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Kinect stop</string>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
     </property>
    </widget>
   </widget>
@@ -240,11 +164,22 @@
     <addaction name="actionD_marrer"/>
     <addaction name="actionArr_ter"/>
    </widget>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>?</string>
+    </property>
+    <addaction name="actionA_propos"/>
+   </widget>
    <addaction name="menuFichier"/>
    <addaction name="menuKinect"/>
+   <addaction name="menu"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionQuitter">
+   <property name="icon">
+    <iconset resource="ressources/ressources.qrc">
+     <normaloff>:/door_in.png</normaloff>:/door_in.png</iconset>
+   </property>
    <property name="text">
     <string>Quitter</string>
    </property>
@@ -253,17 +188,36 @@
    </property>
   </action>
   <action name="actionD_marrer">
+   <property name="icon">
+    <iconset resource="ressources/ressources.qrc">
+     <normaloff>:/play.png</normaloff>:/play.png</iconset>
+   </property>
    <property name="text">
     <string>Démarrer</string>
    </property>
   </action>
   <action name="actionArr_ter">
+   <property name="icon">
+    <iconset resource="ressources/ressources.qrc">
+     <normaloff>:/pause.png</normaloff>:/pause.png</iconset>
+   </property>
    <property name="text">
     <string>Arréter</string>
    </property>
   </action>
+  <action name="actionA_propos">
+   <property name="icon">
+    <iconset resource="ressources/ressources.qrc">
+     <normaloff>:/help.png</normaloff>:/help.png</iconset>
+   </property>
+   <property name="text">
+    <string>A propos</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="ressources/ressources.qrc"/>
+ </resources>
  <connections/>
 </ui>
