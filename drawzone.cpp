@@ -1,6 +1,7 @@
 #include "drawzone.h"
 #include "customevent.h"
 #include <QCoreApplication>
+#include <exception>
 
 #include <QDebug>
 
@@ -11,7 +12,8 @@
  */
 DrawZone::DrawZone(QWidget *parent, QWidget *main) :
     QWidget(parent),
-    mMain(main)
+    mMain(main),
+    mSendTrames(false)
 {
     // Initialisation de chaque squelettes
     for(unsigned int i = 0; i < 5; i++)
@@ -26,6 +28,16 @@ DrawZone::DrawZone(QWidget *parent, QWidget *main) :
     mSkeleton[1].color = Qt::magenta;
     mSkeleton[2].color = Qt::cyan;
     mSkeleton[3].color = Qt::yellow;
+
+    try
+    {
+        mTrame = new TrameDMX();
+        mTrame->run();
+    }
+    catch(std::exception& e)
+    {
+        qDebug() << "exception: " << e.what();
+    }
 }
 
 /**
@@ -37,6 +49,12 @@ void DrawZone::paintEvent(QPaintEvent*)
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.fillRect(QRect(0, 0, width(), height()), Qt::black);
+
+    //painter.setPen(QPen(Qt::blue, 2));
+    //painter.setBrush(Qt::white);
+
+    //painter.drawRect(30, 80, 300, 5);
+    //painter.drawRect(30, 300, 300, 5);
 
     /* AFFICHAGE DES SQUELETTES */
 
@@ -100,9 +118,24 @@ void DrawZone::paintEvent(QPaintEvent*)
         painter.setPen(QPen(Qt::red, 5));
         painter.setBrush(Qt::white);
 
-        painter.drawEllipse(headPos, 30, 30);
+        painter.drawEllipse(headPos, 25, 25);
         painter.drawEllipse(leftPos, 10, 10);
         painter.drawEllipse(rightPos, 10, 10);
+
+        if(mSendTrames)
+        {
+            int PRA = rightPos.x() * 255 / 640;
+            int PRB = rightPos.y() * 255 / 480;
+
+            int PLA = leftPos.x() * 255 / 640;
+            int PLB = leftPos.y() * 255 / 480;
+
+            mTrame->setCanal(0, PRA);
+            mTrame->setCanal(1, PRB);
+
+            mTrame->setCanal(16, PLA);
+            mTrame->setCanal(17, PLB);
+        }
     }
 
     // Dévérouillage du mutex pour le vecteur des points de chaque squelettes
@@ -210,6 +243,11 @@ void DrawZone::DrawJointure(QPainter &painter, int id, NUI_SKELETON_POSITION_IND
     // Point de chaque extremitée
     painter.drawEllipse(pointA, 2, 2);
     painter.drawEllipse(pointB, 2, 2);
+}
+
+void DrawZone::SendTrames(bool actived)
+{
+    mSendTrames = actived;
 }
 
 /**

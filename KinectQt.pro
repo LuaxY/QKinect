@@ -16,19 +16,22 @@ SOURCES += main.cpp\
         programme.cpp \
     customevent.cpp \
     drawzone.cpp \
-    qkinect.cpp
+    qkinect.cpp \
+    TrameDMX.cpp
 
 HEADERS  += programme.h \
     customevent.h \
     drawzone.h \
-    qkinect.h
+    qkinect.h \
+    TrameDMX.h
 
 FORMS    += programme.ui
 
 LIBS     += C:/Kinect/lib/x86/Kinect10.lib
+LIBS     += C:/scratch/DMX/i386/ftd2xx.lib
 
 INCLUDEPATH += C:/Kinect/inc
-#DEPENDPATH  += C:/Kinect/inc/
+INCLUDEPATH += C:/scratch/DMX
 
 RESOURCES += \
     ressources/ressources.qrc

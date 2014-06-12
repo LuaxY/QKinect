@@ -11,19 +11,26 @@ Programme::Programme(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    ui->lineIP->setAlignment(Qt::AlignHCenter);
+
     drawZone = new DrawZone(ui->centralWidget, this);
     drawZone->setGeometry(QRect(300, 0, 640, 480));
 
     kinect = new QKinect(this, drawZone);
 
-    test = new QTimer(this);
-    connect(test, SIGNAL(timeout()), this, SLOT(sltDrawSkeleton()));
+    drawTimer = new QTimer(this);
+    connect(drawTimer, SIGNAL(timeout()), this, SLOT(sltDrawSkeleton()));
 
-    connect(ui->btnActiveStream, SIGNAL(clicked()), this, SLOT(sltActiveStream()));
+    connect(ui->btnStopAll, SIGNAL(clicked()), this, SLOT(sltStopAll()));
     connect(ui->btnKinectStart, SIGNAL(clicked()), this, SLOT(sltKinectStart()));
     connect(ui->btnKinectStop, SIGNAL(clicked()), this, SLOT(sltKinectStop()));
+    connect(ui->isSendTrames, SIGNAL(toggled(bool)), this, SLOT(sltChangeSendTrames(bool)));
 
-    QCoreApplication::postEvent(this, new CustomEvent<StreamEvent>());
+    //QCoreApplication::postEvent(this, new CustomEvent<StreamEvent>());
+
+    ui->statusBar->showMessage("Module NUI initialiser");
+    drawSkeleton = true;
+    drawTimer->start(40);
 }
 
 Programme::~Programme()
@@ -35,12 +42,14 @@ Programme::~Programme()
 
 bool Programme::event(QEvent* event)
 {
-    if (event->type() == CustomEvent<StreamEvent>::eventType)
+    if (event->type() == CustomEvent<StopAll>::eventType)
     {
-        CustomEvent<StreamEvent>* e = static_cast<CustomEvent<StreamEvent>*>(event);
-        qDebug() << "Event Stream";
-        drawSkeleton = !drawSkeleton;
-        test->start(40);
+        CustomEvent<StopAll>* e = static_cast<CustomEvent<StopAll>*>(event);
+        qDebug() << "Stop all Event";
+        ui->statusBar->showMessage("ARRET D'URGENCE");
+        drawSkeleton = false;
+        kinect->stop();
+        drawTimer->stop();
 
         return true;
     }
@@ -67,9 +76,9 @@ void Programme::sltDrawSkeleton()
     }
 }
 
-void Programme::sltActiveStream()
+void Programme::sltStopAll()
 {
-    QCoreApplication::postEvent(this, new CustomEvent<StreamEvent>());
+    QCoreApplication::postEvent(this, new CustomEvent<StopAll>());
 }
 
 void Programme::sltDrawZone()
@@ -82,10 +91,19 @@ void Programme::sltDrawZone()
 
 void Programme::sltKinectStart()
 {
+    //drawSkeleton = true;
     kinect->start();
+    ui->statusBar->showMessage("Kinect lancee");
 }
 
 void Programme::sltKinectStop()
 {
+    //drawSkeleton = false;
     kinect->stop();
+    ui->statusBar->showMessage("Kinect arrêtee");
+}
+
+void Programme::sltChangeSendTrames(bool actived)
+{
+    drawZone->SendTrames(actived);
 }

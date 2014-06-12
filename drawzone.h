@@ -10,6 +10,8 @@
 #include <vector>
 #include <QMutex>
 
+#include "TrameDMX.h"
+
 typedef struct t_skeleton
 {
     Qt::GlobalColor color;
@@ -27,6 +29,7 @@ public:
     // functions
     void SetSkeleton(int id, NUI_SKELETON_DATA data);
     void RemoveSkeleton(int id);
+    void SendTrames(bool actived);
 
     // mutex
     void lock();
@@ -37,6 +40,8 @@ private:
     QWidget* mMain;
     Skeleton mSkeleton[5];
     QMutex mMutex;
+    TrameDMX* mTrame;
+    bool mSendTrames;
 
     // event
     void paintEvent(QPaintEvent*);

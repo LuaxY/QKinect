@@ -26,17 +26,18 @@ private:
     Ui::Programme *ui;
     DrawZone* drawZone;
     bool drawSkeleton;
-    QTimer* test;
+    QTimer* drawTimer;
     QKinect* kinect;
 
     bool event(QEvent* event);
 
 private slots:
     void sltDrawSkeleton();
-    void sltActiveStream();
+    void sltStopAll();
     void sltDrawZone();
     void sltKinectStart();
     void sltKinectStop();
+    void sltChangeSendTrames(bool actived);
 };
 
 #endif // PROGRAMME_H
