@@ -13,7 +13,9 @@
 DrawZone::DrawZone(QWidget *parent, QWidget *main) :
     QWidget(parent),
     mMain(main),
-    mSendTrames(false)
+    mSendTrames(false),
+    mIsTrameActived(true),
+    mIsDrawing(true)
 {
     // Initialisation de chaque squelettes
     for(unsigned int i = 0; i < 5; i++)
@@ -36,6 +38,7 @@ DrawZone::DrawZone(QWidget *parent, QWidget *main) :
     }
     catch(std::exception& e)
     {
+        mIsTrameActived = false;
         qDebug() << "exception: " << e.what();
     }
 }
@@ -61,80 +64,93 @@ void DrawZone::paintEvent(QPaintEvent*)
     // Vérouillage du mutex pour le vecteur des points de chaque squelettes (thread safe)
     lock();
 
-    // Pour chaques squelettes :
-    for(unsigned int i = 0; i < 5; i++)
+    if(mIsDrawing)
     {
-        // Si le squelettes n'a pas encore de données on passe
-        if(!mSkeleton[i].isSet)
-            continue;
-
-        // Si le squelettes n'est plus traquer depuis 20 frames on le supprime
-        if(mSkeleton[i].untracked > 0)
+        // Pour chaques squelettes :
+        for(unsigned int i = 0; i < 5; i++)
         {
-            mSkeleton[i].untracked++;
-            if(mSkeleton[i].untracked > 20)
-            {
-                mSkeleton[i].isSet = false;
+            // Si le squelettes n'a pas encore de données on passe
+            if(!mSkeleton[i].isSet)
                 continue;
+
+            // Si le squelettes n'est plus traquer depuis 20 frames on le supprime
+            if(mSkeleton[i].untracked > 0)
+            {
+                mSkeleton[i].untracked++;
+                if(mSkeleton[i].untracked > 20)
+                {
+                    mSkeleton[i].isSet = false;
+                    continue;
+                }
             }
-        }
 
-        // On dessine chaque jointure du squelette :
+            // On dessine chaque jointure du squelette :
 
-        // Jointures du torse
-        DrawJointure(painter, i, NUI_SKELETON_POSITION_HEAD, NUI_SKELETON_POSITION_SHOULDER_CENTER);
-        DrawJointure(painter, i, NUI_SKELETON_POSITION_SHOULDER_CENTER, NUI_SKELETON_POSITION_SHOULDER_LEFT);
-        DrawJointure(painter, i, NUI_SKELETON_POSITION_SHOULDER_CENTER, NUI_SKELETON_POSITION_SHOULDER_RIGHT);
-        DrawJointure(painter, i, NUI_SKELETON_POSITION_SHOULDER_CENTER, NUI_SKELETON_POSITION_SPINE);
-        DrawJointure(painter, i, NUI_SKELETON_POSITION_SPINE, NUI_SKELETON_POSITION_HIP_CENTER);
-        DrawJointure(painter, i, NUI_SKELETON_POSITION_HIP_CENTER, NUI_SKELETON_POSITION_HIP_LEFT);
-        DrawJointure(painter, i, NUI_SKELETON_POSITION_HIP_CENTER, NUI_SKELETON_POSITION_HIP_RIGHT);
+            // Jointures du torse
+            DrawJointure(painter, i, NUI_SKELETON_POSITION_HEAD, NUI_SKELETON_POSITION_SHOULDER_CENTER);
+            DrawJointure(painter, i, NUI_SKELETON_POSITION_SHOULDER_CENTER, NUI_SKELETON_POSITION_SHOULDER_LEFT);
+            DrawJointure(painter, i, NUI_SKELETON_POSITION_SHOULDER_CENTER, NUI_SKELETON_POSITION_SHOULDER_RIGHT);
+            DrawJointure(painter, i, NUI_SKELETON_POSITION_SHOULDER_CENTER, NUI_SKELETON_POSITION_SPINE);
+            DrawJointure(painter, i, NUI_SKELETON_POSITION_SPINE, NUI_SKELETON_POSITION_HIP_CENTER);
+            DrawJointure(painter, i, NUI_SKELETON_POSITION_HIP_CENTER, NUI_SKELETON_POSITION_HIP_LEFT);
+            DrawJointure(painter, i, NUI_SKELETON_POSITION_HIP_CENTER, NUI_SKELETON_POSITION_HIP_RIGHT);
 
-        // Joiuntures bras gauche
-        DrawJointure(painter, i, NUI_SKELETON_POSITION_SHOULDER_LEFT, NUI_SKELETON_POSITION_ELBOW_LEFT);
-        DrawJointure(painter, i, NUI_SKELETON_POSITION_ELBOW_LEFT, NUI_SKELETON_POSITION_WRIST_LEFT);
-        DrawJointure(painter, i, NUI_SKELETON_POSITION_WRIST_LEFT, NUI_SKELETON_POSITION_HAND_LEFT);
+            // Joiuntures bras gauche
+            DrawJointure(painter, i, NUI_SKELETON_POSITION_SHOULDER_LEFT, NUI_SKELETON_POSITION_ELBOW_LEFT);
+            DrawJointure(painter, i, NUI_SKELETON_POSITION_ELBOW_LEFT, NUI_SKELETON_POSITION_WRIST_LEFT);
+            DrawJointure(painter, i, NUI_SKELETON_POSITION_WRIST_LEFT, NUI_SKELETON_POSITION_HAND_LEFT);
 
-        // Jointures bras droit
-        DrawJointure(painter, i, NUI_SKELETON_POSITION_SHOULDER_RIGHT, NUI_SKELETON_POSITION_ELBOW_RIGHT);
-        DrawJointure(painter, i, NUI_SKELETON_POSITION_ELBOW_RIGHT, NUI_SKELETON_POSITION_WRIST_RIGHT);
-        DrawJointure(painter, i, NUI_SKELETON_POSITION_WRIST_RIGHT, NUI_SKELETON_POSITION_HAND_RIGHT);
+            // Jointures bras droit
+            DrawJointure(painter, i, NUI_SKELETON_POSITION_SHOULDER_RIGHT, NUI_SKELETON_POSITION_ELBOW_RIGHT);
+            DrawJointure(painter, i, NUI_SKELETON_POSITION_ELBOW_RIGHT, NUI_SKELETON_POSITION_WRIST_RIGHT);
+            DrawJointure(painter, i, NUI_SKELETON_POSITION_WRIST_RIGHT, NUI_SKELETON_POSITION_HAND_RIGHT);
 
-        // Jointures jambe gauche
-        DrawJointure(painter, i, NUI_SKELETON_POSITION_HIP_LEFT, NUI_SKELETON_POSITION_KNEE_LEFT);
-        DrawJointure(painter, i, NUI_SKELETON_POSITION_KNEE_LEFT, NUI_SKELETON_POSITION_ANKLE_LEFT);
-        DrawJointure(painter, i, NUI_SKELETON_POSITION_ANKLE_LEFT, NUI_SKELETON_POSITION_FOOT_LEFT);
+            // Jointures jambe gauche
+            DrawJointure(painter, i, NUI_SKELETON_POSITION_HIP_LEFT, NUI_SKELETON_POSITION_KNEE_LEFT);
+            DrawJointure(painter, i, NUI_SKELETON_POSITION_KNEE_LEFT, NUI_SKELETON_POSITION_ANKLE_LEFT);
+            DrawJointure(painter, i, NUI_SKELETON_POSITION_ANKLE_LEFT, NUI_SKELETON_POSITION_FOOT_LEFT);
 
-        // Jointures jambe droite
-        DrawJointure(painter, i, NUI_SKELETON_POSITION_HIP_RIGHT, NUI_SKELETON_POSITION_KNEE_RIGHT);
-        DrawJointure(painter, i, NUI_SKELETON_POSITION_KNEE_RIGHT, NUI_SKELETON_POSITION_ANKLE_RIGHT);
-        DrawJointure(painter, i, NUI_SKELETON_POSITION_ANKLE_RIGHT, NUI_SKELETON_POSITION_FOOT_RIGHT);
+            // Jointures jambe droite
+            DrawJointure(painter, i, NUI_SKELETON_POSITION_HIP_RIGHT, NUI_SKELETON_POSITION_KNEE_RIGHT);
+            DrawJointure(painter, i, NUI_SKELETON_POSITION_KNEE_RIGHT, NUI_SKELETON_POSITION_ANKLE_RIGHT);
+            DrawJointure(painter, i, NUI_SKELETON_POSITION_ANKLE_RIGHT, NUI_SKELETON_POSITION_FOOT_RIGHT);
 
-        // For fun : On grossi les points de la tête et des main pour les mettre en valeur
-        QPoint headPos  = AdjustSize(mSkeleton[i].data.SkeletonPositions[NUI_SKELETON_POSITION_HEAD]);
-        QPoint leftPos  = AdjustSize(mSkeleton[i].data.SkeletonPositions[NUI_SKELETON_POSITION_HAND_LEFT]);
-        QPoint rightPos = AdjustSize(mSkeleton[i].data.SkeletonPositions[NUI_SKELETON_POSITION_HAND_RIGHT]);
+            // For fun : On grossi les points de la tête et des main pour les mettre en valeur
+            QPoint headPos  = AdjustSize(mSkeleton[i].data.SkeletonPositions[NUI_SKELETON_POSITION_HEAD]);
+            QPoint leftPos  = AdjustSize(mSkeleton[i].data.SkeletonPositions[NUI_SKELETON_POSITION_HAND_LEFT]);
+            QPoint rightPos = AdjustSize(mSkeleton[i].data.SkeletonPositions[NUI_SKELETON_POSITION_HAND_RIGHT]);
 
-        painter.setPen(QPen(Qt::red, 5));
-        painter.setBrush(Qt::white);
+            painter.setPen(QPen(Qt::red, 5));
+            painter.setBrush(Qt::white);
 
-        painter.drawEllipse(headPos, 25, 25);
-        painter.drawEllipse(leftPos, 10, 10);
-        painter.drawEllipse(rightPos, 10, 10);
+            painter.drawEllipse(headPos, 25, 25);
+            painter.drawEllipse(leftPos, 10, 10);
+            painter.drawEllipse(rightPos, 10, 10);
 
-        if(mSendTrames)
-        {
-            int PRA = rightPos.x() * 255 / 640;
-            int PRB = rightPos.y() * 255 / 480;
+            if(mSendTrames && mIsTrameActived)
+            {
+                int posHandRightA = rightPos.x() * 127 / 640;
+                int posHandRightB = rightPos.y() * 255 / 480;
 
-            int PLA = leftPos.x() * 255 / 640;
-            int PLB = leftPos.y() * 255 / 480;
+                int posHandLeftA = leftPos.x() * 255 / 640;
+                int posHandLeftB = leftPos.y() * 255 / 480;
 
-            mTrame->setCanal(0, PRA);
-            mTrame->setCanal(1, PRB);
+                // Rotation des projecteurs
+                mTrame->setCanal( 0, posHandLeftA); // Projecteur 1 : PAN
+                mTrame->setCanal( 1, posHandLeftB); //              : TILT
+                mTrame->setCanal(16, posHandLeftA); // Projecteur 2 : PAN
+                mTrame->setCanal(17, posHandLeftB); //              : TILT
 
-            mTrame->setCanal(16, PLA);
-            mTrame->setCanal(17, PLB);
+                // Gestion luminositée
+                mTrame->setCanal(15, 200 - posHandRightB); // Projecteur 1
+                mTrame->setCanal(31, 200 - posHandRightB); // Projecteur 2
+                mTrame->setCanal(14, 255);
+                mTrame->setCanal(30, 255);
+
+                // Gestion couleur
+                mTrame->setCanal( 6, posHandRightA); // Projecteur 1
+                mTrame->setCanal(22, posHandRightA); // Projecteur 2
+            }
         }
     }
 
@@ -245,9 +261,27 @@ void DrawZone::DrawJointure(QPainter &painter, int id, NUI_SKELETON_POSITION_IND
     painter.drawEllipse(pointB, 2, 2);
 }
 
+/**
+ * @brief DrawZone::SendTrames : active ou désactive l'envoi des trames DMX
+ * @param actived
+ */
 void DrawZone::SendTrames(bool actived)
 {
     mSendTrames = actived;
+}
+
+/**
+ * @brief DrawZone::ResetTrames : reset les projecteurs a l'état initial
+ */
+void DrawZone::ResetTrames()
+{
+    //mIsDrawing = false;
+
+    if(mIsTrameActived)
+    {
+        for(int i = 0; i < 32; i++)
+            mTrame->setCanal(i, 0);
+    }
 }
 
 /**

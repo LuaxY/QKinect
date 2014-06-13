@@ -174,6 +174,19 @@
       <string>Envoyer les données aux projecteurs</string>
      </property>
     </widget>
+    <widget class="QPushButton" name="btnResetTrames">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>212</y>
+       <width>251</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Reinitialiser projecteurs</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QGroupBox" name="groupBox_4">
     <property name="geometry">
@@ -254,14 +267,14 @@
     <property name="title">
      <string>Kinect</string>
     </property>
-    <addaction name="actionD_marrer"/>
-    <addaction name="actionArr_ter"/>
+    <addaction name="actionKinectStart"/>
+    <addaction name="actionKinectStop"/>
    </widget>
    <widget class="QMenu" name="menu">
     <property name="title">
      <string>?</string>
     </property>
-    <addaction name="actionA_propos"/>
+    <addaction name="actionAbout"/>
    </widget>
    <addaction name="menuFichier"/>
    <addaction name="menuKinect"/>
@@ -280,7 +293,7 @@
     <string>Ctrl+Q</string>
    </property>
   </action>
-  <action name="actionD_marrer">
+  <action name="actionKinectStart">
    <property name="icon">
     <iconset resource="ressources/ressources.qrc">
      <normaloff>:/play.png</normaloff>:/play.png</iconset>
@@ -289,7 +302,7 @@
     <string>Démarrer</string>
    </property>
   </action>
-  <action name="actionArr_ter">
+  <action name="actionKinectStop">
    <property name="icon">
     <iconset resource="ressources/ressources.qrc">
      <normaloff>:/pause.png</normaloff>:/pause.png</iconset>
@@ -298,7 +311,7 @@
     <string>Arréter</string>
    </property>
   </action>
-  <action name="actionA_propos">
+  <action name="actionAbout">
    <property name="icon">
     <iconset resource="ressources/ressources.qrc">
      <normaloff>:/help.png</normaloff>:/help.png</iconset>

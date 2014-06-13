@@ -17,15 +17,18 @@ SOURCES += main.cpp\
     customevent.cpp \
     drawzone.cpp \
     qkinect.cpp \
-    TrameDMX.cpp
+    TrameDMX.cpp \
+    about.cpp
 
 HEADERS  += programme.h \
     customevent.h \
     drawzone.h \
     qkinect.h \
-    TrameDMX.h
+    TrameDMX.h \
+    about.h
 
-FORMS    += programme.ui
+FORMS    += programme.ui \
+    about.ui
 
 LIBS     += C:/Kinect/lib/x86/Kinect10.lib
 LIBS     += C:/scratch/DMX/i386/ftd2xx.lib

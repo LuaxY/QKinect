@@ -13,6 +13,18 @@ QKinect::QKinect(QObject *parent, DrawZone* drawZone) :
     isInitialized(false),
     mDrawZone(drawZone)
 {
+    // Initialisation de capteur squeletique
+    HRESULT res = NuiInitialize(NUI_INITIALIZE_FLAG_USES_SKELETON);
+
+    if(res != S_OK)
+    {
+        //throw std::logic_error("No Kinect found...");
+        qDebug() << "No Kinect found...";
+    }
+    else
+    {
+        isInitialized = true;
+    }
 }
 
 /**
@@ -23,8 +35,11 @@ void QKinect::start()
     if(isRunning)
         return;
 
-    qDebug() << "starting Kinect";
-    QThread::start();
+    if(isInitialized)
+    {
+        qDebug() << "starting Kinect";
+        QThread::start();
+    }
 }
 
 /**
@@ -32,16 +47,18 @@ void QKinect::start()
  */
 void QKinect::stop()
 {
-    if(isRunning)
+    if(isRunning && isInitialized)
+    {
         isRunning = false;
 
-    qDebug() << "stopping Kinect";
+        qDebug() << "stopping Kinect";
 
-    wait();
-    NuiSkeletonTrackingDisable();
-    //NuiShutdown();
+        wait();
+        NuiSkeletonTrackingDisable();
+        //NuiShutdown();
 
-    isInitialized = false;
+        //isInitialized = false;
+    }
 }
 
 /**
@@ -70,16 +87,8 @@ void QKinect::run()
  */
 void QKinect::init()
 {
-    // Initialisation de capteur squeletique
-    HRESULT res = NuiInitialize(NUI_INITIALIZE_FLAG_USES_SKELETON);
-
-    if(res != S_OK)
-    {
-        throw std::logic_error("No Kinect found...");
-    }
-
     // Démarrage de la capture
-    res = NuiSkeletonTrackingEnable(NULL, 0);
+    HRESULT res = NuiSkeletonTrackingEnable(NULL, 0);
 
     if(res != S_OK)
         throw std::logic_error("Cannot initialize Skeleton Tracking.");

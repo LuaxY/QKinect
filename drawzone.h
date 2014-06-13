@@ -30,6 +30,8 @@ public:
     void SetSkeleton(int id, NUI_SKELETON_DATA data);
     void RemoveSkeleton(int id);
     void SendTrames(bool actived);
+    void ResetTrames();
+    bool mIsDrawing;
 
     // mutex
     void lock();
@@ -41,6 +43,8 @@ private:
     Skeleton mSkeleton[5];
     QMutex mMutex;
     TrameDMX* mTrame;
+
+    bool mIsTrameActived;
     bool mSendTrames;
 
     // event

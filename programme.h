@@ -9,6 +9,7 @@
 
 #include "drawzone.h"
 #include "qkinect.h"
+#include "about.h"
 
 namespace Ui {
 class Programme;
@@ -28,8 +29,10 @@ private:
     bool drawSkeleton;
     QTimer* drawTimer;
     QKinect* kinect;
+    About* aboutUi;
 
     bool event(QEvent* event);
+    void closeEvent(QCloseEvent* event);
 
 private slots:
     void sltDrawSkeleton();
@@ -38,6 +41,9 @@ private slots:
     void sltKinectStart();
     void sltKinectStop();
     void sltChangeSendTrames(bool actived);
+    void sltDisplayAbout();
+    void sltCloseApp();
+    void sltResetTrames();
 };
 
 #endif // PROGRAMME_H

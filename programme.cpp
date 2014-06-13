@@ -10,8 +10,9 @@ Programme::Programme(QWidget *parent) :
     drawSkeleton(false)
 {
     ui->setupUi(this);
-
     ui->lineIP->setAlignment(Qt::AlignHCenter);
+
+    this->setFixedSize(this->width(), this->height());
 
     drawZone = new DrawZone(ui->centralWidget, this);
     drawZone->setGeometry(QRect(300, 0, 640, 480));
@@ -21,14 +22,24 @@ Programme::Programme(QWidget *parent) :
     drawTimer = new QTimer(this);
     connect(drawTimer, SIGNAL(timeout()), this, SLOT(sltDrawSkeleton()));
 
+    // boutons
     connect(ui->btnStopAll, SIGNAL(clicked()), this, SLOT(sltStopAll()));
     connect(ui->btnKinectStart, SIGNAL(clicked()), this, SLOT(sltKinectStart()));
     connect(ui->btnKinectStop, SIGNAL(clicked()), this, SLOT(sltKinectStop()));
+
+    // actions
+    connect(ui->actionQuitter, SIGNAL(triggered()), this, SLOT(sltCloseApp()));
+    connect(ui->actionKinectStart, SIGNAL(triggered()), this, SLOT(sltKinectStart()));
+    connect(ui->actionKinectStop, SIGNAL(triggered()), SLOT(sltKinectStop()));
+    connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(sltDisplayAbout()));
+
+    // contrôle
     connect(ui->isSendTrames, SIGNAL(toggled(bool)), this, SLOT(sltChangeSendTrames(bool)));
+    connect(ui->btnResetTrames, SIGNAL(clicked()), this, SLOT(sltResetTrames()));
 
     //QCoreApplication::postEvent(this, new CustomEvent<StreamEvent>());
 
-    ui->statusBar->showMessage("Module NUI initialiser");
+    ui->statusBar->showMessage("Module NUI initialisee");
     drawSkeleton = true;
     drawTimer->start(40);
 }
@@ -40,6 +51,17 @@ Programme::~Programme()
     delete ui;
 }
 
+void Programme::closeEvent(QCloseEvent* event)
+{
+    sltCloseApp();
+    event->ignore();
+}
+
+void Programme::sltCloseApp()
+{
+    QApplication::exit(0);
+}
+
 bool Programme::event(QEvent* event)
 {
     if (event->type() == CustomEvent<StopAll>::eventType)
@@ -47,7 +69,8 @@ bool Programme::event(QEvent* event)
         CustomEvent<StopAll>* e = static_cast<CustomEvent<StopAll>*>(event);
         qDebug() << "Stop all Event";
         ui->statusBar->showMessage("ARRET D'URGENCE");
-        drawSkeleton = false;
+        drawZone->mIsDrawing = false;
+        drawZone->ResetTrames();
         kinect->stop();
         drawTimer->stop();
 
@@ -92,6 +115,7 @@ void Programme::sltDrawZone()
 void Programme::sltKinectStart()
 {
     //drawSkeleton = true;
+    drawZone->mIsDrawing = true;
     kinect->start();
     ui->statusBar->showMessage("Kinect lancee");
 }
@@ -99,11 +123,23 @@ void Programme::sltKinectStart()
 void Programme::sltKinectStop()
 {
     //drawSkeleton = false;
+    drawZone->mIsDrawing = false;
     kinect->stop();
-    ui->statusBar->showMessage("Kinect arrêtee");
+    ui->statusBar->showMessage("Kinect arretee");
 }
 
 void Programme::sltChangeSendTrames(bool actived)
 {
     drawZone->SendTrames(actived);
+}
+
+void Programme::sltResetTrames()
+{
+    drawZone->ResetTrames();
+}
+
+void Programme::sltDisplayAbout()
+{
+    aboutUi = new About();
+    aboutUi->show();
 }
